@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bootstrap 5 + Jodit Editor</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <!-- Jodit Editor CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jodit/3.5.3/jodit.min.css">
+</head>
+
+<body>
+  <!-- <div class="container my-5">
+    <div class="row">
+      <div class="col-lg-8">
+        <textarea id="editor"></textarea>
+      </div>
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Editor Tools</h5>
+            <p class="card-text">Add your editor tools here.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+  <div class="row">
+    <div class="col-sm-8">
+      <textarea id="editor"></textarea>
+    </div>
+    <div class="col-sm-4">
+
+      <div class="card bg-light text-dark">
+        <div class="card-header">Variables</div>
+        <div class="card-body">
+          <div id="variables">
+            <!-- <div class="row">
+              <div class="col-sm-4">
+                <label id="label_abogado" class="small">Abogado</label>
+              </div>
+              <div class="col-sm-8">
+                <input type="text" id="abogado" class="form-control small">
+              </div>
+            </div> -->
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="card-footer">
+            <button class="btn btn-success actualizar-btn">
+              Actualizar
+              <div class="spinner-border spinner-border-sm ms-2 d-none" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+            </button>
+          </div>
+      </div>
+      
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/es.min.js"></script>
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+  <!-- Jodit Editor JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jodit/3.5.3/jodit.min.js"></script>
+  <!-- Init Jodit Editor -->
+  <script>
+
+    moment.locale("es");
+    Jodit.defaultOptions.controls.funciones = {
+      icon: "dropdown",
+      tooltip: "My Dropdown",
+      list: {
+        option1: "Numero a Texto",
+        option2: "Fecha a Texto",
+        insertDate: "Insert Current Date",
+      },
+      exec: function (editor, _, control, key) {
+        const selectedOption = control.control.name;
+        if (selectedOption === "option1") {
+          const inputDialog = $("<div>", { class: "input-dialog" }).appendTo(
+            "body"
+          );
+          const input = $("<input>", {
+            type: "number",
+            placeholder: "Ingrese un número",
+          }).appendTo(inputDialog);
+          const okButton = $("<button>", { text: "Aceptar" }).appendTo(
+            inputDialog
+          );
+          const cancelButton = $("<button>", { text: "Cancelar" }).appendTo(
+            inputDialog
+          );
+
+          input.focus();
+
+          okButton.on("click", function () {
+            const value = input.val();
+            const numberToText = convertirNumeroATexto(value);
+            editor.s.insertHTML(numberToText);
+            inputDialog.remove();
+          });
+
+          cancelButton.on("click", function () {
+            inputDialog.remove();
+          });
+
+          inputDialog.on("keydown", function (event) {
+            if (event.keyCode === 27) {
+              // 27 = Esc key
+              inputDialog.remove();
+            }
+          });
+
+          return false;
+        }
+        if (selectedOption === "option2") {
+          const inputDialog = $("<div>", { class: "input-dialog" }).appendTo(
+            "body"
+          );
+          const input = $("<input>", {
+            type: "text",
+            placeholder: "Ingrese una fecha (DD/MM/YYYY)",
+          }).appendTo(inputDialog);
+          const okButton = $("<button>", { text: "Aceptar" }).appendTo(
+            inputDialog
+          );
+          const cancelButton = $("<button>", { text: "Cancelar" }).appendTo(
+            inputDialog
+          );
+
+          input.focus();
+
+          okButton.on("click", function () {
+            const value = input.val();
+            const fecha = moment(value, "DD/MM/YYYY");
+            const texto = fecha.format("DD [de] MMMM [del] YYYY");
+            editor.s.insertHTML(texto);
+            inputDialog.remove();
+          });
+
+          cancelButton.on("click", function () {
+            inputDialog.remove();
+          });
+
+          inputDialog.on("keydown", function (event) {
+            if (event.keyCode === 27) {
+              // 27 = Esc key
+              inputDialog.remove();
+            }
+          });
+
+          return false;
+        }
+        if (selectedOption === "insertDate") {
+          editor.s.insertHTML(new Date().toDateString());
+        }
+      },
+    };
+
+    function convertirNumeroATexto(numero) {
+      const digitos = String(numero).split("");
+      const unidades = [
+        "",
+        "uno",
+        "dos",
+        "tres",
+        "cuatro",
+        "cinco",
+        "seis",
+        "siete",
+        "ocho",
+        "nueve",
+      ];
+      const decenas = [
+        "",
+        "diez",
+        "veinte",
+        "treinta",
+        "cuarenta",
+        "cincuenta",
+        "sesenta",
+        "setenta",
+        "ochenta",
+        "noventa",
+      ];
+      const especiales = [
+        "diez",
+        "once",
+        "doce",
+        "trece",
+        "catorce",
+        "quince",
+        "dieciséis",
+        "diecisiete",
+        "dieciocho",
+        "diecinueve",
+      ];
+
+      if (numero < 10) {
+        return unidades[numero];
+      }
+      if (numero < 20) {
+        return especiales[numero - 10];
+      }
+      if (numero % 10 === 0) {
+        return decenas[numero / 10];
+      }
+      return decenas[Math.floor(numero / 10)] + " y " + unidades[numero % 10];
+    }
+
+    Jodit.defaultOptions.controls.variables = {
+      icon: "variables",
+      tooltip: "Variables",
+      list: {},
+      exec: function (editor, _, control) {
+        const selectedOption = control.control.name;
+        console.log(control.control.name)
+        if (selectedOption !== "variables") {
+          const modal = $("<div>", { class: "modal" }).appendTo("body");
+          const dialog = $("<div>", { class: "modal-dialog" }).appendTo(modal);
+          const content = $("<div>", { class: "modal-content" }).appendTo(dialog);
+          const header = $("<div>", { class: "modal-header" }).appendTo(content);
+          const title = $("<h5>", { class: "modal-title", text: "Ingrese el nombre de "+ control.control.text }).appendTo(header);
+          const closeButton = $("<button>", { type: "button", class: "btn-close", "data-bs-dismiss": "modal" }).appendTo(header);
+          const body = $("<div>", { class: "modal-body" }).appendTo(content);
+          const input = $("<input>", { type: "text", class: "form-control", placeholder: "Nombre del abogado" }).appendTo(body);
+          const footer = $("<div>", { class: "modal-footer" }).appendTo(content);
+          const cancelButton = $("<button>", { type: "button", class: "btn btn-secondary", "data-bs-dismiss": "modal", text: "Cancelar" }).appendTo(footer);
+          const okButton = $("<button>", { type: "button", class: "btn btn-primary", text: "Aceptar" }).appendTo(footer);
+        
+          input.focus();
+        console.log(editor.s)
+      okButton.on("click", function () {
+            const value = input.val();
+            const markId = "editor_" + control.control.name;
+            const markText = " {{ " + value + " }} ";
+          
+            let markElement = document.getElementById(markId);
+          
+            if (markElement) {
+              markElement.textContent = markText;
+            } else {
+              markElement = $("<mark>", { id: markId, text: markText });
+            
+              editor.s.insertHTML(markElement[0]); // Insertar marca en el editor
+          
+            }
+          
+            $("#" + control.control.name).attr("value", value);
+            $("#" + control.control.name).removeAttr("hidden");
+            $("#label_" + control.control.name).removeAttr("hidden");
+            modal.modal("hide");
+          }); 
+
+     /*     okButton.on("click", function () {
+            const value = input.val();
+            const markId = "editor_" + control.control.name;
+          
+            let markElement = document.getElementById(markId);
+          
+            if (markElement) {
+              markElement.textContent = " {{ " + value + " }} ";
+            } else {
+              markElement = $("<mark>", { id: markId, text: " {{ " + value + " }} " });
+            }
+            
+            const savedRange = window.getSelection().getRangeAt(0);
+            savedRange.insertNode(markElement[0]);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(savedRange);
+          
+            $("#" + control.control.name).attr("value", value);
+            $("#" + control.control.name).removeAttr("hidden");
+            $("#label_" + control.control.name).removeAttr("hidden");
+            modal.modal("hide");
+          }); */
+          
+          
+          
+          
+          
+          
+          
+        
+          cancelButton.on("click", function () {
+            modal.modal("hide");
+          });
+        
+          modal.on("keydown", function (event) {
+            if (event.keyCode === 27) {
+              // 27 = Esc key
+              modal.modal("hide");
+            }
+          });
+        
+          modal.modal("show");
+          return false;
+        }
+        
+      },
+    };
+        // llenar la lista del menu desplegable variables
+    $.ajax({
+      url: "https://jsonplaceholder.typicode.com/users",
+      method: "GET",
+      dataType: "json",
+      success: function (data) {
+        // Procesar respuesta
+        for (var i = 0; i < data.length; i++) {
+          // Obtener valores relevantes
+          var name = data[i].name;
+          var id = data[i].id;
+    
+          // Agregar el dato a la lista de variables
+          Jodit.defaultOptions.controls.variables.list["variable" + id] = name;
+        }
+      },
+      error: function () {
+        console.log("Error");
+      },
+    });
+
+    Jodit.defaultOptions.controls.addWord = {
+      tooltip: "Enter text and insert",
+      icon: "pencil",
+      popup: (editor, current, self, close) => {
+        const form = editor.create.fromHTML(
+          `<form>
+        <input type="text"/>
+        <button type="submit">Insert</button>
+      </form>`
+        );
+
+        editor.e.on(form, "submit", (e) => {
+          e.preventDefault();
+          editor.s.insertHTML(
+            `<mark>` + form.querySelector("input").value + `</mark>`
+          );
+          close();
+        });
+
+        return form;
+      },
+    };
+    const editor = new Jodit("#editor", {
+      toolbarAdaptive: false,
+      toolbarSticky: false,
+      toolbar: true,
+      toolbarButtonSize: "small",
+      buttons: [
+        "source",
+        "|",
+        "bold",
+        "strikethrough",
+        "underline",
+        "italic",
+        "|",
+        "ul",
+        "ol",
+        "|",
+        "outdent",
+        "indent",
+        "|",
+        "font",
+        "fontsize",
+        "brush",
+        "paragraph",
+        "|",
+        "image",
+        "video",
+        "table",
+        "link",
+        "|",
+        "align",
+        "undo",
+        "redo",
+        "|",
+        "hr",
+        "eraser",
+        "copyformat",
+        "fullsize",
+        "print",
+        "about",
+
+      ],
+      extraButtons: [
+
+        {
+          name: "addWord",
+          iconURL: "https://img.icons8.com/ios/50/000000/pen.png",
+        },
+        {
+          name: "variables",
+          iconURL: "https://img.icons8.com/ios/50/000000/variable.png",
+        },
+
+        {
+          name: "funciones",
+          iconURL: "https://img.icons8.com/ios/50/000000/hand-drag.png",
+        }
+
+      ],
+      events: {
+        afterInit: function (editor) {
+          editor.value = "";
+        },
+      },
+
+    });
+  </script>
+  <div class="row" id="variables"></div>
+
+  <script>
+     $(document).ready(function () {
+      // Hacer petición AJAX
+      $.ajax({
+        url: "https://jsonplaceholder.typicode.com/users",
+        method: "GET",
+        dataType: "json",
+        success: function (data) {
+          // Procesar respuesta
+          for (var i = 0; i < data.length; i++) {
+            // Obtener valores relevantes
+            var name = data[i].name;
+            var value = data[i].email;
+            var id = "variable" + data[i].id;
+  
+            // Crear elementos HTML
+            var label = $("<label>", {
+              text: name,
+              class: "small",
+              hidden: true,
+              id: "label_" + id,
+            });
+  
+            var input = $("<input>", {
+              type: "text",
+              id: id,
+              hidden: true,
+              value: value,
+              class: "form-control small",
+            });
+  
+            // Insertar elementos HTML en el documento
+            var row = $("<div>", { class: "row" });
+            var colLabel = $("<div>", { class: "col-sm-4" }).appendTo(row);
+            var colInput = $("<div>", { class: "col-sm-8" }).appendTo(row);
+  
+            label.appendTo(colLabel);
+            input.appendTo(colInput);
+            row.appendTo("#variables");
+  
+            // Mostrar label e input
+            label.removeAttr("hidden");
+            input.removeAttr("hidden");
+          }
+        },
+        error: function () {
+          console.log("Error");
+        },
+      });
+    });
+
+   // actualizar datos de las variables
+   $(document).ready(function() {
+    $(".actualizar-btn").click(function() {
+      // Mostrar animación de carga
+      $(".spinner-border").removeClass("d-none");
+  
+      // Simular una tarea de actualización
+      setTimeout(function() {
+        // Ocultar animación de carga
+        $(".spinner-border").addClass("d-none");
+  
+        // Actualizar valores
+        $("#variables input").each(function() {
+          var id = $(this).attr("id");
+          let input = document.getElementById(id);
+          console.log("editor_"+id)
+          let editorVariable = document.getElementById("editor_"+id);
+          if(editorVariable != null){
+            editorVariable.textContent = input.value;
+          }
+
+
+        });
+  
+        // Mostrar animación de actualizado
+        $("#variables").addClass("animate__animated animate__bounceIn");
+        setTimeout(function() {
+          $("#variables").removeClass("animate__animated animate__bounceIn");
+        }, 1000);
+      }, 2000);
+    });
+  });
+  
+  
+
+  </script>
+  
+</body>
+
+</html>
