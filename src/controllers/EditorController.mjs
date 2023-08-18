@@ -7,12 +7,12 @@ export default class EditorController {
   guardarContenido(data) {
     this.pool.query(
       "UPDATE documentos SET texto = $1 WHERE id = $2",
-      [data.content, data.id],
+      [data.content, data.documentId],
       (error, result) => {
         if (error) {
           console.error("Error al guardar el contenido:", error);
         } else {
-          console.log("Contenido guardado exitosamente");
+          console.log("Contenido guardado exitosamente: ", result.rows);
         }
       }
     );

@@ -40,11 +40,12 @@ io.on("connection", (socket) => {
     console.log("Un cliente se ha desconectado.");
   });
 
-  socket.on("mensaje", (data) => {
-    // editorController.guardarContenido(data);
-    socket.emit("respuesta", `Se ha recibido un mensaje: ${data}`);
+  socket.on("guardar_texto", (data) => {
+    log("Se ha recibido una solicitud de guardado de texto");
+    editorController.guardarContenido(data);
+    socket.emit("texto_guardado", data);
 
-    console.log(`Se ha recibido un mensaje: ${data}`);
+    console.log(`Se ha guardado data: ${data}`);
   });
 
   socket.on("leer_notas", async () => {

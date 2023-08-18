@@ -45,5 +45,29 @@ const getDocumentosGenerales = async (req, res) => {
   }
 };
 
+const getDocumento = async (req, res) => {
+  try {
+    console.log("getDocumento");
+    console.log(req.query)
+    const { id_documento} = req.query;
 
-export { get, post, getDocumentosGenerales };
+    const result = await pool.query(
+      "select doc.* from documentos doc join documento_generales dg on doc.id = dg.documento_id "
+      + "join generales g on dg.generales_id = g.id  where doc.id = $1 ",
+      [id_documento]
+    );
+
+    console.log("Leido exitosamente");
+    const response = result.rows;
+    console.log(result.rows);
+
+    // res.status(200).json(response.map((item) => item.data_generales) || undefined );
+    res.status(200).json(response);
+  } catch (error) {
+    console.error("Error al leer:", error);
+    res.status(500).json({ error: "Error al obtener el documento" });
+  }
+};
+
+
+export { get, post, getDocumentosGenerales, getDocumento };
