@@ -18,6 +18,25 @@ export default class EditorController {
     );
   }
 
+  leerContenido(data) {	
+    return new Promise((resolve, reject) => {
+      this.pool.query(
+        "SELECT texto FROM documentos WHERE id = $1",
+        [data.documentId],
+        (error, result) => {
+          if (error) {
+            console.error("Error al leer el contenido:", error);
+            reject(error);
+          } else {
+            console.log("Contenido leído exitosamente");
+            console.log(result.rows);
+            resolve(result.rows);
+          }
+        }
+      );
+    });
+  }
+
   async leerNotas() {
     return new Promise((resolve, reject) => {
       this.pool.query("SELECT * FROM notes", (error, result) => {

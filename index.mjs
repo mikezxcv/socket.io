@@ -34,10 +34,10 @@ const pool = new Pool({
 const editorController = new EditorController(io, pool);
 
 io.on("connection", (socket) => {
-  console.log("Un cliente se ha conectado.");
+  console.log("Un cliente se ha conectado con id: ", socket.id);
 
   socket.on("disconnect", () => {
-    console.log("Un cliente se ha desconectado.");
+    console.log("Un cliente se ha desconectado con id: ", socket.id);
   });
 
   socket.on("guardar_texto", (data) => {
@@ -47,6 +47,15 @@ io.on("connection", (socket) => {
 
     console.log(`Se ha guardado data: ${data}`);
   });
+
+  socket.on("obtener_texto", async (data) => {
+    log("Se ha recibido una solicitud de lectura de texto");
+    const texto = await editorController.leerContenido(data);
+    socket.emit("texto_obtenido", texto);
+    log(texto);
+  });
+
+
 
   socket.on("leer_notas", async () => {
     log("Se ha recibido una solicitud de lectura de notas");
