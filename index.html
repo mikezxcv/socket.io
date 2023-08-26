@@ -13,25 +13,11 @@
 </head>
 
 <body>
-  <!-- <div class="container my-5">
-    <div class="row">
-      <div class="col-lg-8">
-        <textarea id="editor"></textarea>
-      </div>
-      <div class="col-lg-4">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Editor Tools</h5>
-            <p class="card-text">Add your editor tools here.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div> -->
+ 
 
   <div class="row">
     <div class="col-sm-8">
-      <textarea id="editor"></textarea>
+      <textarea id="editor">predeterminado contenido</textarea>
     </div>
     <div class="col-sm-4">
 
@@ -39,14 +25,7 @@
         <div class="card-header">Variables</div>
         <div class="card-body">
           <div id="variables">
-            <!-- <div class="row">
-              <div class="col-sm-4">
-                <label id="label_abogado" class="small">Abogado</label>
-              </div>
-              <div class="col-sm-8">
-                <input type="text" id="abogado" class="form-control small">
-              </div>
-            </div> -->
+           
           </div>
         </div>
         <div class="card-footer">
@@ -62,6 +41,7 @@
       
     </div>
   </div>
+  </div>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
@@ -73,6 +53,10 @@
   <!-- Jodit Editor JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jodit/3.5.3/jodit.min.js"></script>
   <!-- Init Jodit Editor -->
+
+   <!-- Importa la biblioteca Socket.io -->
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+
   <script>
 
     moment.locale("es");
@@ -331,6 +315,7 @@
     });
 
     Jodit.defaultOptions.controls.addWord = {
+
       tooltip: "Enter text and insert",
       icon: "pencil",
       popup: (editor, current, self, close) => {
@@ -352,6 +337,8 @@
         return form;
       },
     };
+
+
     const editor = new Jodit("#editor", {
       toolbarAdaptive: false,
       toolbarSticky: false,
@@ -417,6 +404,37 @@
       },
 
     });
+    const socket = io("http://localhost:3000"); 
+    // conectar al servidor
+    socket.on("connect", () => {
+        console.log("Conectado al servidor");
+        socket.emit("obtener_texto", { documentId: 11 });
+    });
+
+      socket.on("connect_error", (error) => {
+          console.log("Error de conexión:", error);
+      });
+
+    socket.on("texto_guardado", (data) => {
+        if (data[0].texto) {
+            editor.value = "DESDE SOCKET:" + data[0].texto;
+        } 
+        console.log('leido desde socketio:',data)
+    });
+
+    socket.on("texto_obtenido", (data) => {
+      if (data[0].texto) {
+          editor.value = data[0].texto;
+      } 
+      console.log('lectura inicial:',data) 
+  });
+
+    function guardarTexto() {
+      const texto = editor.value;
+      socket.emit("guardar_texto", { content: texto, documentId: 11 });
+  }
+
+  setInterval(guardarTexto, 5000);
   </script>
   <div class="row" id="variables"></div>
 
@@ -491,8 +509,6 @@
           if(editorVariable != null){
             editorVariable.textContent = input.value;
           }
-
-
         });
   
         // Mostrar animación de actualizado
@@ -507,6 +523,7 @@
   
 
   </script>
+
   
 </body>
 
