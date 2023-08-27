@@ -45,7 +45,7 @@ io.on("connection", (socket) => {
     editorController.guardarContenido(data);
     socket.emit("texto_guardado", data);
 
-    console.log(`Se ha guardado data: ${data}`);
+    console.log(`Se ha guardado data: ${data}`);  
   });
 
   socket.on("obtener_texto", async (data) => {

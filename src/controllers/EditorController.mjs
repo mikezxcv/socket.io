@@ -5,6 +5,8 @@ export default class EditorController {
   }
 
   guardarContenido(data) {
+    console.log("Guardando contenido...");
+    console.log(data)
     this.pool.query(
       "UPDATE documentos SET texto = $1 WHERE id = $2",
       [data.content, data.documentId],
