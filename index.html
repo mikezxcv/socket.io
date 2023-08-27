@@ -416,8 +416,10 @@
       });
 
     socket.on("texto_guardado", (data) => {
-        if (data[0].texto) {
-            editor.value = "DESDE SOCKET:" + data[0].texto;
+      console.log("exto_guardado_evento")
+        console.log(data)
+        if (data.content) {
+            editor.value =  data.content;
         } 
         console.log('leido desde socketio:',data)
     });
